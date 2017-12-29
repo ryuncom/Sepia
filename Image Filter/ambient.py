@@ -4,7 +4,6 @@ from scipy import stats
 from PIL import Image
 
 def ambient(im):
-    width, height = im.size
     arr = np.asarray(im)
     row, col, vals = arr.shape
 
@@ -19,14 +18,15 @@ def ambient(im):
             green_arr[r][c] = arr[r][c][1]
             blue_arr[r][c] = arr[r][c][2]
     
-    buffer = 10
+    buffer = 100
     max_vals_R = findMode(buffer, red_arr)
     max_vals_G = findMode(buffer, green_arr)
     max_vals_B = findMode(buffer, blue_arr)
-
-    new_red = convertVals(np.array(red_arr), max_vals_R)
-    new_green = convertVals(np.array(green_arr), max_vals_G)
-    new_blue = convertVals(np.array(blue_arr), max_vals_B)
+    
+    partition_width = 10
+    new_red = convertVals(np.array(red_arr), max_vals_R, partition_width)
+    new_green = convertVals(np.array(green_arr), max_vals_G, partition_width)
+    new_blue = convertVals(np.array(blue_arr), max_vals_B, partition_width)
     
     new_arr = [[[0 for v in range(3)] for c in range(col)] for r in range(row)]
     for r in range(0, row):
@@ -49,17 +49,27 @@ def findMode(buffer, arr):
     for i in range(0, buffer):
         max_vals[i] = values[((np.where(counts == counts_sort[i]))[0][0])]
     
+    max_vals = np.sort(max_vals, kind='quicksort', order=None)
+
     return max_vals
 
-def convertVals(arr, max_val):
-    for i in range(arr.shape[0]):
-        for j in range(arr.shape[1]):
-            if arr[i][j] in max_val:
-                arr[i][j] = (arr[i][j] + 128) % 2
+# computation for altering colors
+def convertVals(arr, max_val, partition_width):
+    tick = 0;
+    
+    for p in range(partition_width):
+        for i in range(arr.shape[0]):
+            for j in range(arr.shape[1]):
+                index_start = tick * partition_width
+                if arr[i][j] in max_val[index_start:index_start+partition_width]:
+                    arr[i][j] = (arr[i][j] + 128) % 256
+        tick = tick + 1
+
     return arr
 
 # Main
 if __name__ == "__main__":
-    im = Image.open('/Users/annielee/Desktop/Sepia/Sepia_local/PythonOnXCode/4.png')
+    im = Image.open('/Users/annielee/Desktop/Sepia/Sepia_local/PythonOnXCode/2.png')
     newim = ambient(im)
     newim.show()
+
