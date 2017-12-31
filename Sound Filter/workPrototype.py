@@ -22,7 +22,7 @@ print(person)
 
 sys.stdin = PseudoTTY(sys.stdin)
 
-player = player.Player("C:\Users\Ryun an\Downloads\Heaven_Sent_and_Ecstasy_-_Rapping_With_My_Subconsc.wav",person,1024)
+player = player.Player("C:\Users\Ryun an\Downloads\Kendrick Lamar - LOYALTY. ft. Rihanna.wav",person,1024)
 
 inputChar='a'
 floatBuffer = 0.0
@@ -34,27 +34,21 @@ threshold = 3
 counter = 0
 removeCounter = 0;
 
+player.beatCal()
+
 print "start Playing"
 
 while player.returnData():
-    
     tempBuffer = [0 for x in range(32)]
+    i = False
     
     if low=='y':
         player.lofiPlay()
     elif noise == 'y':
         player.noisePlay()
-    else:
-        X = player.play()
-        
-    for i in range(0,31):
-        for j in range(i*32,(i+1)*32):
-            tempBuffer[i] = tempBuffer[i] + X[j]
-        tempBuffer[i] = 32*tempBuffer[i]/1024
-        if tempBuffer[i] > average[i] and i<6:
-            print "beat in range ",i  
-        average[i] = average[i] + ((tempBuffer[i] - energyBuffer[counter%43][i])/32)    
-        energyBuffer[counter%43][i] = tempBuffer[i]
+    else:  
+        player.play()
+
     
     if loop=='y':
         player.loop()
@@ -84,7 +78,7 @@ while player.returnData():
             print "Set Start Position at ",player.wav.tell()
             player.setStart()
         elif inputChar == "e":
-            print "Set Start Position at ",player.wav.tell()
+            print "Set End Position at ",player.wav.tell()
             player.setEnd()
         elif inputChar == "i":
             print "Start and End Position Reinitialized"
